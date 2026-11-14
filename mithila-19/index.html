@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>A little something for you</title>
+
+  <!-- Privacy & indexing -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Open Graph (generic — no photos of her) -->
+  <meta property="og:title"       content="A little something for you">
+  <meta property="og:description" content="Someone made you something. Open it.">
+  <meta property="og:type"        content="website">
+  <!-- og:image is set dynamically from CONFIG.ogImage if present -->
+
+  <!-- Fonts: Gloock (headings), Figtree (UI), Reenie Beanie (letter only) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500&family=Reenie+Beanie&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Global chrome ──────────────────────────────────────────────────── -->
+  <div id="test-tag" hidden aria-live="polite">Test mode — no emails sent</div>
+
+  <nav id="nav-bar" aria-label="Navigation">
+    <button id="back-btn" aria-label="Go back" hidden>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M12 4L6 10L12 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- ── Ambient layers (managed by JS) ────────────────────────────────── -->
+  <div id="bokeh-layer"    aria-hidden="true"></div>
+  <div id="petals-layer"   aria-hidden="true"></div>
+  <div id="sparkles-layer" aria-hidden="true"></div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- Scene 0 · The Gift                                                   -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <section class="scene" id="scene-0" data-mood="rooftop" aria-label="The gift">
+    <div class="scene-inner">
+      <p class="scene-intro">Hey Mithila,<br>someone made something for you.</p>
+
+      <!-- Countdown (shown only when unlockTime is in the future) -->
+      <div id="countdown-wrap" hidden>
+        <p class="countdown-label">Opens in</p>
+        <div id="countdown-clock">
+          <span class="cd-block"><span id="cd-h">00</span><span class="cd-unit">h</span></span>
+          <span class="cd-sep">:</span>
+          <span class="cd-block"><span id="cd-m">00</span><span class="cd-unit">m</span></span>
+          <span class="cd-sep">:</span>
+          <span class="cd-block"><span id="cd-s">00</span><span class="cd-unit">s</span></span>
+        </div>
+      </div>
+
+      <!-- Gift box -->
+      <div id="gift-scene">
+        <!-- Table -->
+        <div id="gift-table">
+          <!-- Lamp -->
+          <div id="gift-lamp" aria-hidden="true">
+            <div id="lamp-shade"></div>
+            <div id="lamp-stem"></div>
+            <div id="lamp-base"></div>
+            <div id="lamp-glow"></div>
+          </div>
+
+          <!-- The gift box -->
+          <button id="gift-box-btn" aria-label="Open the gift" class="gift-box">
+            <div id="gift-lid">
+              <div class="gift-ribbon-h"></div>
+              <div class="gift-bow">
+                <div class="bow-left"></div>
+                <div class="bow-right"></div>
+                <div class="bow-center"></div>
+              </div>
+            </div>
+            <div id="gift-body">
+              <div class="gift-ribbon-v"></div>
+              <div id="gift-light-spill" aria-hidden="true"></div>
+            </div>
+          </button>
+        </div>
+
+        <!-- CTA below the table -->
+        <button id="open-gift-cta" class="cta-btn">Open the gift</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- Scene 1 · Birthday                                                   -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <section class="scene" id="scene-1" data-mood="rooftop" aria-label="Happy birthday">
+    <div class="scene-inner">
+      <h1 id="birthday-heading" class="shimmer-heading">Happy 19th birthday,<br><span class="name-span">Mithila</span></h1>
+      <div id="birthday-message">
+        <p id="bday-line-1"></p>
+        <p id="bday-line-2"></p>
+      </div>
+
+      <!-- Cake -->
+      <div id="cake-wrap">
+        <div id="cake" role="img" aria-label="Birthday cake with two candles">
+          <!-- Candles -->
+          <div class="candle-row">
+            <div class="candle" id="candle-1" data-blown="false">
+              <div class="candle-wick">
+                <div class="flame" id="flame-1" aria-label="Candle flame 1 — tap to blow out">
+                  <div class="flame-inner"></div>
+                </div>
+              </div>
+              <div class="candle-body">
+                <span class="candle-num">1</span>
+              </div>
+            </div>
+            <div class="candle" id="candle-9" data-blown="false">
+              <div class="candle-wick">
+                <div class="flame" id="flame-9" aria-label="Candle flame 9 — tap to blow out">
+                  <div class="flame-inner"></div>
+                </div>
+              </div>
+              <div class="candle-body">
+                <span class="candle-num">9</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cake tiers -->
+          <div id="cake-tier-top"></div>
+          <div id="cake-tier-bottom"></div>
+          <div id="cake-plate"></div>
+        </div>
+        <p id="candle-hint" class="hint-text">Tap the flames to blow them out</p>
+      </div>
+
+      <!-- Wish (shown after candles blown) -->
+      <div id="wish-wrap" hidden>
+        <p class="wish-prompt">Make a wish.</p>
+        <div class="wish-input-row">
+          <input id="wish-input" type="text" placeholder="Type it here…" maxlength="120" autocomplete="off" aria-label="Your wish">
+          <button id="wish-send-btn" class="cta-btn" aria-label="Send wish">Let it fly ✦</button>
+        </div>
+        <p class="wish-privacy">It stays between you and the sky.</p>
+      </div>
+
+      <!-- Flying lantern (animated by JS) -->
+      <div id="wish-lantern" aria-hidden="true"></div>
+
+      <button id="birthday-next-btn" class="cta-btn scene-advance-btn" hidden>See your moments →</button>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- Scene 2 · Moments (photos)                                           -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <section class="scene" id="scene-2" data-mood="moments" aria-label="Moments">
+    <div class="scene-inner moments-inner">
+      <h2 class="scene-heading">The Beauty 🌸</h2>
+      
+      <div class="polaroid-wrapper">
+        <button id="photo-prev-btn" class="photo-nav-arrow" aria-label="Previous photo">‹</button>
+        <div id="polaroid-stack" class="polaroid-deck" role="region" aria-label="Photos of Mithila">
+          <div id="polaroid-card" class="polaroid" tabindex="0" role="button" aria-label="Current photo. Tap to advance.">
+            <div class="washi-tape" aria-hidden="true"></div>
+            <div class="polaroid-img-wrap">
+              <img id="polaroid-img" src="" alt="">
+            </div>
+            <p id="polaroid-caption" class="polaroid-caption"></p>
+          </div>
+        </div>
+        <button id="photo-next-btn" class="photo-nav-arrow" aria-label="Next photo">›</button>
+      </div>
+
+      <p class="hint-text" id="swipe-hint">Tap photo, swipe, or use arrows to flip 🌸</p>
+
+      <div class="photo-actions-row">
+        <button id="photo-flip-btn" class="cta-btn cta-btn--primary">Next photo 🌸</button>
+        <button id="photo-zoom-btn" class="cta-btn cta-btn--outline" aria-label="View full photo">View full 🔍</button>
+      </div>
+
+      <button id="moments-next-btn" class="cta-btn scene-advance-btn" hidden>Keep going ✨</button>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="photo-lightbox" hidden role="dialog" aria-modal="true" aria-label="Full-size photo">
+      <button id="lightbox-close" aria-label="Close photo">✕</button>
+      <img id="lightbox-img" src="" alt="">
+      <p id="lightbox-caption"></p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- Scene 3 · Ten things that make you, you                              -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <section class="scene" id="scene-3" data-mood="jasmine" aria-label="Ten things that make you, you">
+    <div class="scene-inner">
+      <h2 class="scene-heading">Ten things that make you, you.</h2>
+      <p class="hint-text">Tap each card to flip it.</p>
+      <div id="flip-cards-grid" role="list"></div>
+      <button id="tenthings-next-btn" class="cta-btn scene-advance-btn">And one more thing →</button>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- Scene 4 · Quiz: Who's more likely to…?                              -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <section class="scene" id="scene-4" data-mood="rooftop" aria-label="Who is more likely to">
+    <div class="scene-inner">
+      <h2 class="scene-heading">Who's more likely to…?</h2>
+
+      <div id="quiz-wrap">
+        <div id="quiz-question-wrap">
+          <p id="quiz-question" aria-live="polite"></p>
+          <div id="quiz-btn-row">
+            <button id="quiz-me-btn"  class="quiz-answer-btn">Me</button>
+            <button id="quiz-you-btn" class="quiz-answer-btn">You</button>
+          </div>
+          <p id="quiz-reaction" aria-live="polite" hidden></p>
+        </div>
+
+        <div id="quiz-verdict-wrap" hidden>
+          <p id="quiz-verdict-text"></p>
+          <button id="quiz-next-btn" class="cta-btn scene-advance-btn">Almost there →</button>
+        </div>
+
+        <p id="quiz-counter" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- Scene 5 · The letter                                                 -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <section class="scene" id="scene-5" data-mood="gold" aria-label="A letter">
+    <div class="scene-inner">
+      <div id="envelope-wrap">
+        <button id="envelope-btn" class="envelope" aria-label="Tap to open the letter">
+          <div class="env-flap" id="env-flap"></div>
+          <div class="env-body">
+            <div class="env-seal">❤</div>
+          </div>
+        </button>
+        <p class="hint-text" id="env-hint">Tap to open</p>
+      </div>
+
+      <!-- Letter paper (shown after envelope opens) -->
+      <div id="letter-paper" hidden role="article" aria-label="Letter from Pranay">
+        <div id="letter-lines"></div>
+        <div class="letter-actions">
+          <button id="letter-skip-btn" class="skip-link" aria-label="Skip typing animation">Skip</button>
+        </div>
+      </div>
+
+      <button id="letter-next-btn" class="cta-btn scene-advance-btn" hidden>One last thing →</button>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- Scene 6 · The treat                                                  -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <section class="scene" id="scene-6" data-mood="cafe" aria-label="Pick your treat">
+    <div class="scene-inner treat-inner">
+      <h2 class="scene-heading">One last thing: a treat from me</h2>
+      <p class="treat-subtext">Your birthday, your call. Pick whatever suits you, no pressure.</p>
+
+      <!-- Treat options -->
+      <div id="treat-options-wrap">
+        <p class="section-label">What sounds good?</p>
+        <div id="treat-options" role="list" aria-label="Treat options"></div>
+      </div>
+
+      <!-- Date picker (revealed after treat selected) -->
+      <div id="treat-date-wrap" hidden>
+        <p class="section-label">Pick a day</p>
+        <div id="treat-calendar" class="calendar-wrap">
+          <div class="cal-nav">
+            <button class="cal-nav-btn" id="cal-prev" aria-label="Previous month">‹</button>
+            <span class="cal-month-label" id="cal-month-label"></span>
+            <button class="cal-nav-btn" id="cal-next" aria-label="Next month">›</button>
+          </div>
+          <div class="cal-weekdays" aria-hidden="true">
+            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+          </div>
+          <div class="cal-grid" id="cal-grid" role="grid" aria-label="Select a date"></div>
+        </div>
+      </div>
+
+      <!-- Time chips (revealed after date selected) -->
+      <div id="treat-time-wrap" hidden>
+        <p class="section-label">What time?</p>
+        <div id="time-chips" role="list" aria-label="Time options"></div>
+      </div>
+
+      <!-- Optional extras (revealed after time selected) -->
+      <div id="treat-optional-wrap" hidden>
+        <details class="optional-details">
+          <summary class="section-label optional-summary">Add a backup option (optional) ▾</summary>
+
+          <div class="backup-block">
+            <p class="section-label-sm">Backup day</p>
+            <div id="backup-calendar" class="calendar-wrap">
+              <div class="cal-nav">
+                <button class="cal-nav-btn" id="bcal-prev" aria-label="Previous month">‹</button>
+                <span class="cal-month-label" id="bcal-month-label"></span>
+                <button class="cal-nav-btn" id="bcal-next" aria-label="Next month">›</button>
+              </div>
+              <div class="cal-weekdays" aria-hidden="true">
+                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+              </div>
+              <div class="cal-grid" id="bcal-grid" role="grid" aria-label="Select a backup date"></div>
+            </div>
+
+            <p class="section-label-sm">Backup time</p>
+            <div id="backup-time-chips" role="list" aria-label="Backup time options"></div>
+          </div>
+        </details>
+
+        <div class="extra-fields">
+          <label for="treat-place" class="field-label">Any place in mind?</label>
+          <input id="treat-place" type="text" class="text-input" placeholder="Leave blank if you don't mind" autocomplete="off">
+
+          <label for="treat-note" class="field-label">Anything I should know?</label>
+          <textarea id="treat-note" class="text-input text-area" placeholder="Allergies, timing, whatever you like" rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- Live summary -->
+      <div id="treat-summary-wrap" hidden aria-live="polite">
+        <p id="treat-summary-text" class="treat-summary"></p>
+      </div>
+
+      <!-- Submit -->
+      <button id="treat-submit-btn" class="cta-btn cta-btn--primary" disabled>Lock in my treat</button>
+
+      <!-- Error message -->
+      <div id="treat-error" hidden aria-live="assertive">
+        <p id="treat-error-text"></p>
+        <a id="whatsapp-fallback" href="#" target="_blank" rel="noopener" hidden class="wa-link">Send it on WhatsApp instead →</a>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div id="treat-success" class="treat-success" hidden>
+      <div class="treat-success-inner">
+        <div class="success-check" aria-hidden="true">✦</div>
+        <h2 id="treat-success-heading" class="scene-heading"></h2>
+        <p id="treat-success-detail"></p>
+        <div class="success-actions">
+          <a id="gcal-link" href="#" target="_blank" rel="noopener" class="cta-btn cta-btn--outline">Add to Google Calendar</a>
+          <button id="ics-btn" class="cta-btn cta-btn--outline">Download .ics</button>
+          <button id="change-pick-btn" class="cta-btn cta-btn--ghost">Change my pick</button>
+        </div>
+        <p class="ps-line">P.S. I got a little ping the moment you opened the gift. That's the only thing I track.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Hidden YouTube player ──────────────────────────────────────────── -->
+  <div id="yt-player-div" aria-hidden="true" style="position:fixed;width:1px;height:1px;opacity:0.01;pointer-events:none;top:0;left:0;"></div>
+
+  <!-- ── Libraries ──────────────────────────────────────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Config must load before script.js -->
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
